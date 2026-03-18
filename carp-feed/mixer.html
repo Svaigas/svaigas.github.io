@@ -556,6 +556,80 @@
       opacity: 0.75;
     }
 
+    /* ── Preset picker ── */
+    .bait-mode-toggle {
+      display: flex;
+      gap: 0;
+      margin-bottom: 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      width: fit-content;
+    }
+
+    .mode-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.3rem 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .mode-btn.active {
+      background: rgba(110, 231, 183, 0.15);
+      color: var(--accent-protein);
+    }
+
+    .preset-select {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.45rem 0.65rem;
+      outline: none;
+      transition: border-color 0.2s;
+      cursor: pointer;
+      margin-bottom: 0.4rem;
+    }
+
+    .preset-select:focus {
+      border-color: rgba(110, 231, 183, 0.4);
+    }
+
+    .preset-info {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      margin-bottom: 0.25rem;
+      min-height: 1rem;
+    }
+
+    .manual-fields {
+      display: contents;
+    }
+
+    .bait-row.preset-mode .manual-fields {
+      display: none;
+    }
+
+    /* Override grid for preset vs manual */
+    .bait-row {
+      grid-template-columns: 1fr 110px 110px auto;
+      grid-template-rows: auto;
+    }
+
+    .bait-name-col { grid-column: 1; }
+    .bait-preset-col { grid-column: 1 / span 3; }
+    .bait-remove-col { grid-column: 4; grid-row: 1; }
+
     /* ── Mobile ── */
     @media (max-width: 640px) {
       .container { padding: 1rem 1rem 3rem; }
@@ -667,6 +741,7 @@
   <script>
     // ── State ────────────────────────────────────────────────
     let feedData = [];
+    let groundbaitsData = [];
     let baits = [];
     let baitIdCounter = 0;
     let pieChartInstance = null;
@@ -681,10 +756,8 @@
       try {
         const resp = await fetch('data/feed-data.json');
         feedData = await resp.json();
-        // Sort by temp for interpolation
         feedData.sort((a, b) => a.temp - b.temp);
       } catch (e) {
-        // Fallback inline data if fetch fails (e.g. file:// protocol)
         feedData = [
           { temp: 4,  protein: 20, fat: 4,  season: 'Zima',   icon: '❄️' },
           { temp: 7,  protein: 22, fat: 5,  season: 'Zima',   icon: '❄️' },
@@ -699,7 +772,19 @@
         ];
       }
 
-      // Default two baits
+      // Load predefined groundbaits
+      try {
+        const r2 = await fetch('data/groundbaits.json');
+        groundbaitsData = await r2.json();
+      } catch (e) {
+        // Fallback inline
+        groundbaitsData = [
+          { id: 'sonubaits-mmm-original', brand: 'Sonubaits', name: 'Match Method Mix Original', protein: 34.4, fat: 9.3, notes: '' },
+          { id: 'sonubaits-dm-natural',   brand: 'Sonubaits', name: 'DM Natural Feeder Biscuit & Corn', protein: 11.35, fat: 3.5, notes: '' },
+        ];
+      }
+
+      // Default two baits (manual)
       addBait('Zanęta 1', 35, 8);
       addBait('Zanęta 2', 22, 5);
       updateTargetDisplay();
@@ -777,45 +862,88 @@
 
     function renderBaits() {
       const list = document.getElementById('baitsList');
-      // Save current input values before re-render
+      // Save current input values + modes before re-render
       const vals = {};
       baits.forEach(b => {
         const nameEl    = document.getElementById(`name-${b.id}`);
         const proteinEl = document.getElementById(`protein-${b.id}`);
         const fatEl     = document.getElementById(`fat-${b.id}`);
+        const modeEl    = document.getElementById(`mode-${b.id}`);
+        const presetEl  = document.getElementById(`preset-${b.id}`);
         if (nameEl) vals[b.id] = {
-          name:    nameEl.value,
-          protein: proteinEl.value,
-          fat:     fatEl.value
+          name:      nameEl.value,
+          protein:   proteinEl.value,
+          fat:       fatEl.value,
+          mode:      modeEl  ? modeEl.dataset.mode : 'manual',
+          presetId:  presetEl ? presetEl.value : '',
         };
       });
       list.innerHTML = '';
+      // Build preset options string once
+      const presetOpts = [
+        `<option value="">— wybierz z listy —</option>`,
+        ...groundbaitsData.map(g =>
+          `<option value="${g.id}">${g.brand} – ${g.name}</option>`
+        )
+      ].join('');
+
       baits.forEach((b, idx) => {
         const color = PALETTE[idx % PALETTE.length];
         const v = vals[b.id] || {};
+        const mode = v.mode || 'manual';
         const row = document.createElement('div');
-        row.className = 'bait-row';
-        row.style.borderLeftColor = color;
-        row.style.borderLeftWidth = '3px';
+        row.className = 'bait-row' + (mode === 'preset' ? ' preset-mode' : '');
+        row.style.cssText = `border-left-color:${color};border-left-width:3px;grid-template-columns:1fr 110px 110px auto;`;
         row.innerHTML = `
-          <div class="field-group">
-            <span class="field-label" style="color:${color}">Zanęta ${idx + 1}</span>
+          <!-- header with mode toggle -->
+          <div style="grid-column:1/span 3;display:flex;align-items:center;gap:0.75rem;margin-bottom:0.5rem;">
+            <span class="field-label" style="color:${color};font-size:0.8rem;">Zanęta ${idx + 1}</span>
+            <div class="bait-mode-toggle" id="mode-${b.id}" data-mode="${mode}">
+              <button class="mode-btn${mode === 'manual' ? ' active' : ''}" onclick="setMode(${b.id},'manual')">✏️ Ręczne</button>
+              <button class="mode-btn${mode === 'preset' ? ' active' : ''}" onclick="setMode(${b.id},'preset')">📦 Preset</button>
+            </div>
+          </div>
+
+          <!-- PRESET mode -->
+          <div id="preset-wrap-${b.id}" style="grid-column:1/span 3;display:${mode === 'preset' ? 'block' : 'none'}">
+            <select id="preset-${b.id}" class="preset-select" onchange="applyPreset(${b.id})">
+              ${presetOpts}
+            </select>
+            <div class="preset-info" id="preset-info-${b.id}"></div>
+          </div>
+
+          <!-- MANUAL name field -->
+          <div class="field-group" style="display:${mode === 'manual' ? 'flex' : 'none'};flex-direction:column;gap:3px;" id="name-wrap-${b.id}">
+            <span class="field-label">Nazwa</span>
             <input id="name-${b.id}" class="field-input" type="text"
                    placeholder="np. Halibut Pellet" value="${v.name || ''}">
           </div>
-          <div class="field-group">
-            <span class="field-label">🧬 Białko (%)</span>
-            <input id="protein-${b.id}" class="field-input protein-input" type="number"
-                   min="0" max="100" step="0.1" placeholder="35" value="${v.protein ?? ''}">
+
+          <!-- Protein + Fat row – always spans full width so it never floats next to the dropdown -->
+          <div id="values-wrap-${b.id}" style="grid-column:1/span 3;display:flex;gap:0.75rem;">
+            <div class="field-group" style="flex:1">
+              <span class="field-label">🧬 Białko (%)</span>
+              <input id="protein-${b.id}" class="field-input protein-input" type="number"
+                     min="0" max="100" step="0.1" placeholder="35" value="${v.protein ?? ''}"
+                     ${mode === 'preset' ? 'readonly style="opacity:0.6"' : ''}>
+            </div>
+            <div class="field-group" style="flex:1">
+              <span class="field-label">🫧 Tłuszcz (%)</span>
+              <input id="fat-${b.id}" class="field-input fat-input" type="number"
+                     min="0" max="100" step="0.1" placeholder="8" value="${v.fat ?? ''}"
+                     ${mode === 'preset' ? 'readonly style="opacity:0.6"' : ''}>
+            </div>
           </div>
-          <div class="field-group">
-            <span class="field-label">🫧 Tłuszcz (%)</span>
-            <input id="fat-${b.id}" class="field-input fat-input" type="number"
-                   min="0" max="100" step="0.1" placeholder="8" value="${v.fat ?? ''}">
-          </div>
-          <button class="remove-btn" onclick="removeBait(${b.id})" title="Usuń zanętę">✕</button>
+
+          <button class="remove-btn" onclick="removeBait(${b.id})" title="Usuń zanętę" style="grid-row:1;grid-column:4;">✕</button>
         `;
         list.appendChild(row);
+        // Restore preset selection
+        if (mode === 'preset' && v.presetId) {
+          const sel = document.getElementById(`preset-${b.id}`);
+          sel.value = v.presetId;
+          applyPreset(b.id, false); // fill values but don't re-render
+        }
       });
     }
 
@@ -823,15 +951,62 @@
       document.getElementById('addBaitBtn').disabled = baits.length >= 3;
     }
 
+    // ── Mode & preset helpers ─────────────────────────────────
+    function setMode(id, mode) {
+      const toggle = document.getElementById(`mode-${id}`);
+      toggle.dataset.mode = mode;
+      toggle.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      toggle.querySelector(`.mode-btn:${mode === 'manual' ? 'first-child' : 'last-child'}`).classList.add('active');
+      // Show/hide preset dropdown vs manual name field
+      document.getElementById(`preset-wrap-${id}`).style.display = mode === 'preset' ? 'block' : 'none';
+      document.getElementById(`name-wrap-${id}`).style.display   = mode === 'manual' ? 'flex'  : 'none';
+      // Protein/fat inputs: readonly + dimmed in preset, editable in manual
+      ['protein', 'fat'].forEach(f => {
+        const el = document.getElementById(`${f}-${id}`);
+        if (mode === 'preset') { el.readOnly = true;  el.style.opacity = '0.6'; }
+        else                   { el.readOnly = false; el.style.opacity = '1';   el.value = ''; }
+      });
+      if (mode === 'preset') applyPreset(id, false);
+    }
+
+    function applyPreset(id, clearFirst = true) {
+      const sel   = document.getElementById(`preset-${id}`);
+      const info  = document.getElementById(`preset-info-${id}`);
+      const gdata = groundbaitsData.find(g => g.id === sel.value);
+      if (!gdata) {
+        if (info) info.textContent = '';
+        ['protein','fat'].forEach(f => { if (clearFirst) document.getElementById(`${f}-${id}`).value = ''; });
+        return;
+      }
+      document.getElementById(`protein-${id}`).value = gdata.protein;
+      document.getElementById(`fat-${id}`).value     = gdata.fat;
+      // Update name field too (used in readBaits)
+      const nameEl = document.getElementById(`name-${id}`);
+      if (nameEl) nameEl.value = `${gdata.brand} ${gdata.name}`;
+      if (info) info.textContent = `Białko: ${gdata.protein}% · Tłuszcz: ${gdata.fat}%${gdata.notes ? ' · ' + gdata.notes : ''}`;
+    }
+
     // ── Read bait values from DOM ─────────────────────────────
     function readBaits() {
-      return baits.map((b, idx) => ({
-        id:      b.id,
-        name:    document.getElementById(`name-${b.id}`).value.trim() || `Zanęta ${idx + 1}`,
-        protein: parseFloat(document.getElementById(`protein-${b.id}`).value),
-        fat:     parseFloat(document.getElementById(`fat-${b.id}`).value),
-        color:   PALETTE[idx % PALETTE.length],
-      }));
+      return baits.map((b, idx) => {
+        const toggle = document.getElementById(`mode-${b.id}`);
+        const mode   = toggle ? toggle.dataset.mode : 'manual';
+        let name;
+        if (mode === 'preset') {
+          const sel   = document.getElementById(`preset-${b.id}`);
+          const gdata = groundbaitsData.find(g => g.id === sel.value);
+          name = gdata ? `${gdata.brand} ${gdata.name}` : `Zanęta ${idx + 1}`;
+        } else {
+          name = (document.getElementById(`name-${b.id}`)?.value.trim()) || `Zanęta ${idx + 1}`;
+        }
+        return {
+          id: b.id,
+          name,
+          protein: parseFloat(document.getElementById(`protein-${b.id}`).value),
+          fat:     parseFloat(document.getElementById(`fat-${b.id}`).value),
+          color:   PALETTE[idx % PALETTE.length],
+        };
+      });
     }
 
     // ── Solver ────────────────────────────────────────────────
