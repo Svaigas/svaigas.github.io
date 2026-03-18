@@ -1,0 +1,12 @@
+[
+  { "temp": 4,  "protein": 20, "fat": 4,  "season": "Zima",   "icon": "❄️", "cls": "winter", "dose": "0.0–0.3", "note": "Metabolizm minimalny. Okazyjne dokarmianie lub brak." },
+  { "temp": 7,  "protein": 22, "fat": 5,  "season": "Zima",   "icon": "❄️", "cls": "winter", "dose": "0.3–0.5", "note": "Powolne budzenie się apetytu. Łatwo strawne węglowodany." },
+  { "temp": 10, "protein": 25, "fat": 6,  "season": "Wiosna", "icon": "🌱", "cls": "spring", "dose": "0.5–1.0", "note": "Rozpoczęcie żerowania. Stopniowe zwiększanie dawki." },
+  { "temp": 14, "protein": 28, "fat": 7,  "season": "Wiosna", "icon": "🌱", "cls": "spring", "dose": "1.0–1.5", "note": "Wzrost aktywności trawiennej. Wzrasta potrzeba białka." },
+  { "temp": 18, "protein": 32, "fat": 8,  "season": "Wiosna", "icon": "🌸", "cls": "spring", "dose": "1.5–2.5", "note": "Aktywny wzrost. Dobre wykorzystanie białka i tłuszczu." },
+  { "temp": 20, "protein": 35, "fat": 9,  "season": "Lato",   "icon": "☀️", "cls": "summer", "dose": "2.5–3.5", "note": "Optimum wzrostu. Wysokie zapotrzebowanie na białko." },
+  { "temp": 23, "protein": 36, "fat": 11, "season": "Lato",   "icon": "☀️", "cls": "summer", "dose": "3.0–4.0", "note": "Szczyt metabolizmu. Optymalny stosunek B:T = ~3.3:1." },
+  { "temp": 25, "protein": 38, "fat": 12, "season": "Lato",   "icon": "☀️", "cls": "summer", "dose": "3.0–4.0", "note": "Maksymalna intensywność karmienia. Tłuszcz oszczędza białko." },
+  { "temp": 28, "protein": 36, "fat": 11, "season": "Lato",   "icon": "🌡️", "cls": "summer", "dose": "2.5–3.5", "note": "Wysoka temp. — lekki spadek apetytu. Dobra jakość białka." },
+  { "temp": 30, "protein": 33, "fat": 10, "season": "Lato",   "icon": "🌡️", "cls": "hot",    "dose": "2.0–3.0", "note": "Stres cieplny. Białko łatwo przyswajalne, mniejsze dawki." }
+]
