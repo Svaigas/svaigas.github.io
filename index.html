@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Svaigas Main Hub - Discover projects and resources.">
     <title>Svaigas | Projects Hub</title>
-    
+
     <!-- Modern Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
+
     <style>
         :root {
             --bg-color: #09090b;
@@ -31,7 +32,7 @@
 
         body {
             background-color: var(--bg-color);
-            background-image: 
+            background-image:
                 radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15), transparent 25%),
                 radial-gradient(circle at 85% 30%, rgba(168, 85, 247, 0.15), transparent 25%);
             color: var(--text-main);
@@ -226,34 +227,69 @@
         }
 
         @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
         @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; }
-            main { min-height: 500px; }
-            .tab-btn { padding: 1rem; }
-            .tab-content { padding: 1.5rem; }
-            .grid-container { grid-template-columns: 1fr; }
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            main {
+                min-height: 500px;
+            }
+
+            .tab-btn {
+                padding: 1rem;
+            }
+
+            .tab-content {
+                padding: 1.5rem;
+            }
+
+            .grid-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
+
 <body>
 
     <header>
         <h1>Svaigas Hub</h1>
-        <p class="subtitle">Welcome to the main directory. Explore projects, research, and applications housed within this space.</p>
+        <p class="subtitle">Welcome to the main directory. Explore projects, research, and applications housed within
+            this space.</p>
     </header>
 
     <main>
@@ -267,13 +303,15 @@
                 <div class="card">
                     <h2>About This Hub</h2>
                     <p>This GitHub Pages site serves as the central hub for the Svaigas organization.</p>
-                    <p>It provides quick access to our active web applications like the Carp Feed optimization tool, enabling quick demonstration and usage directly from the browser.</p>
+                    <p>It provides quick access to our active web applications like the Carp Feed optimization tool,
+                        enabling quick demonstration and usage directly from the browser.</p>
                 </div>
-                
+
                 <div class="card">
                     <h2>Quick Links</h2>
                     <ul class="links-list">
-                        <li><a href="https://github.com/Svaigas/svaigas.github.io" target="_blank">GitHub Repository</a></li>
+                        <li><a href="https://github.com/Svaigas/svaigas.github.io" target="_blank">GitHub Repository</a>
+                        </li>
                         <li><a href="carp-feed/index.html">Carp Feed App (Direct Fullscreen)</a></li>
                         <li><a href="#" onclick="openTab(null, 'carp-feed'); return false;">Open Carp Feed Tab</a></li>
                     </ul>
@@ -304,15 +342,16 @@
 
             // Show current tab and add active class to button
             document.getElementById(tabName).classList.add("active");
-            
+
             if (evt) {
                 evt.currentTarget.classList.add("active");
             } else {
                 // If called without event (e.g. from a link), find the matching button and activate it
                 const targetBtn = document.querySelector(`.tab-btn[onclick*="${tabName}"]`);
-                if(targetBtn) targetBtn.classList.add("active");
+                if (targetBtn) targetBtn.classList.add("active");
             }
         }
     </script>
 </body>
+
 </html>
