@@ -1,331 +1,721 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Carp Feed Research & Guide</title>
-    <meta name="description" content="Comprehensive research and guides on carp nutrition, feeding strategies, and bait making.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <title>Żywienie Karpia — Białko i Tłuszcz vs Temperatura Wody</title>
+    <meta name="description"
+        content="Interaktywny wykres zależności zawartości białka i tłuszczu w paszy dla karpia (1-3 kg) od temperatury wody. Oparte na badaniach naukowych.">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
-        :root {
-            --bg-dark: #0f172a; /* Slate 900 */
-            --bg-darker: #020617; /* Slate 950 */
-            --bg-card: #1e293b; /* Slate 800 */
-            --text-main: #f8fafc; /* Slate 50 */
-            --text-muted: #94a3b8; /* Slate 400 */
-            --accent-primary: #10b981; /* Emerald 500 */
-            --accent-primary-hover: #059669; /* Emerald 600 */
-            --accent-secondary: #0ea5e9; /* Sky 500 */
-        }
-
-        * {
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0f1117;
+            --bg-card: #1a1d27;
+            --bg-card-hover: #22263a;
+            --accent-protein: #6ee7b7;
+            --accent-protein-rgb: 110, 231, 183;
+            --accent-fat: #fbbf24;
+            --accent-fat-rgb: 251, 191, 36;
+            --accent-ratio: #818cf8;
+            --accent-ratio-rgb: 129, 140, 248;
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #2d3348;
+            --glow-protein: rgba(110, 231, 183, 0.15);
+            --glow-fat: rgba(251, 191, 36, 0.15);
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-darker);
-            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
             line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
         }
 
-        h1, h2, h3, h4 {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            line-height: 1.2;
-        }
-
-        /* --- Header / Hero --- */
-        header {
-            position: relative;
-            min-height: 60vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            padding: 2rem;
-            background: radial-gradient(circle at top right, rgba(14, 165, 233, 0.15), transparent 50%),
-                        radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.15), transparent 50%),
-                        var(--bg-darker);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            overflow: hidden;
-        }
-
-        /* Decorative background element */
-        header::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPgo8cmVjdCB3aWR0aD0iOCIgaGVpZ2h0PSI4IiBmaWxsPSIjZmZmIiBmaWxsLW9wYWNpdHk9IjAuMDIiLz4KPHBhdGggZD0iTTAgMEw4IDhaTTggMEwwIDhaIiBzdHJva2U9IiNmZmYiIHN0cm9rZS1vcGFjaXR5PSIwLjA1IiBzdHJva2Utd2lkdGg9IjAuNSIvPgo8L3N2Zz4=');
-            opacity: 0.5;
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
             z-index: 0;
         }
 
-        .hero-content {
+        .container {
             position: relative;
             z-index: 1;
-            max-width: 800px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
         }
 
         .badge {
-            display: inline-block;
-            padding: 0.25rem 1rem;
-            border-radius: 9999px;
-            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(110, 231, 183, 0.1);
+            border: 1px solid rgba(110, 231, 183, 0.2);
+            color: var(--accent-protein);
+            font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--accent-primary);
-            border: 1px solid rgba(16, 185, 129, 0.2);
-            margin-bottom: 1.5rem;
+            letter-spacing: 0.08em;
+            padding: 6px 14px;
+            border-radius: 100px;
+            margin-bottom: 1rem;
         }
 
-        header h1 {
-            font-size: clamp(3rem, 8vw, 5rem);
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #fff 0%, var(--text-muted) 100%);
+        .badge svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #e2e8f0 30%, #6ee7b7 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            margin-bottom: 0.6rem;
         }
 
         header p {
-            font-size: clamp(1.125rem, 3vw, 1.5rem);
-            color: var(--text-muted);
-            max-width: 600px;
-            margin: 0 auto 2.5rem;
-        }
-
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem 2rem;
-            border-radius: 0.75rem;
-            font-weight: 600;
-            font-size: 1.125rem;
-            text-decoration: none;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn-primary {
-            background-color: var(--accent-primary);
-            color: white;
-            box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.2), 0 2px 4px -2px rgba(16, 185, 129, 0.2);
-        }
-
-        .btn-primary:hover {
-            background-color: var(--accent-primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3), 0 4px 6px -4px rgba(16, 185, 129, 0.3);
-        }
-
-        /* --- Main Content --- */
-        main {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 5rem 2rem;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-
-        .section-header h2 {
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .section-header p {
-            color: var(--text-muted);
-            font-size: 1.125rem;
-            max-width: 600px;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 620px;
             margin: 0 auto;
         }
 
-        /* --- Grid Layouts --- */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .card {
-            background-color: var(--bg-dark);
-            border-radius: 1.5rem;
-            padding: 2.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                        box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-                        border-color 0.4s ease;
+        /* ── Chart Card ──────────────────────────── */
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem 2rem 1.5rem;
+            margin-bottom: 2rem;
             position: relative;
             overflow: hidden;
-            z-index: 1;
         }
 
-        /* Subtle glowing gradient inside cards */
-        .card::before {
+        .chart-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0) 100%);
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.4s ease;
+            inset: -1px;
+            border-radius: 16px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(110, 231, 183, 0.15), transparent 50%, rgba(251, 191, 36, 0.1));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
         }
 
-        .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
-            border-color: rgba(16, 185, 129, 0.2);
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
-        .card:hover::before {
-            opacity: 1;
+        .chart-title {
+            font-size: 1.15rem;
+            font-weight: 700;
         }
 
-        .card-icon {
-            display: inline-flex;
+        .legend {
+            display: flex;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 420px;
+        }
+
+        /* ── Data Table ──────────────────────────── */
+        .table-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .table-card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table-card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        thead {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        th {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            transition: background 0.15s;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-card-hover);
+        }
+
+        .temp-cell {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .temp-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            width: 3.5rem;
-            height: 3.5rem;
-            border-radius: 1rem;
-            background: rgba(14, 165, 233, 0.1);
-            color: var(--accent-secondary);
-            margin-bottom: 1.5rem;
-            font-size: 1.5rem;
-        }
-        
-        .card:nth-child(2) .card-icon {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--accent-primary);
+            font-size: 0.85rem;
         }
 
-        .card:nth-child(3) .card-icon {
-            background: rgba(139, 92, 246, 0.1);
-            color: #8b5cf6;
+        .temp-cold {
+            background: rgba(96, 165, 250, 0.15);
         }
 
-        .card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
+        .temp-cool {
+            background: rgba(45, 212, 191, 0.15);
         }
 
-        .card p {
-            color: var(--text-muted);
-            margin-bottom: 1.5rem;
+        .temp-warm {
+            background: rgba(110, 231, 183, 0.15);
         }
 
-        .card-link {
-            display: inline-flex;
-            align-items: center;
-            color: var(--text-main);
-            text-decoration: none;
+        .temp-hot {
+            background: rgba(251, 191, 36, 0.15);
+        }
+
+        .protein-val {
+            color: var(--accent-protein);
+            font-weight: 600;
+        }
+
+        .fat-val {
+            color: var(--accent-fat);
+            font-weight: 600;
+        }
+
+        .ratio-val {
+            color: var(--accent-ratio);
+            font-weight: 600;
+        }
+
+        .season-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-size: 0.78rem;
             font-weight: 500;
-            transition: color 0.2s ease;
         }
 
-        .card-link:hover {
-            color: var(--accent-primary);
+        .season-winter {
+            background: rgba(96, 165, 250, 0.12);
+            color: #93bbfc;
         }
 
-        .card-link svg {
-            margin-left: 0.5rem;
-            transition: transform 0.2s ease;
+        .season-spring {
+            background: rgba(45, 212, 191, 0.12);
+            color: #5eead4;
         }
 
-        .card-link:hover svg {
-            transform: translateX(4px);
+        .season-summer {
+            background: rgba(110, 231, 183, 0.12);
+            color: #6ee7b7;
         }
 
-        /* --- Footer --- */
-        footer {
-            text-align: center;
-            padding: 3rem 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            color: var(--text-muted);
-            font-size: 0.875rem;
+        .season-autumn {
+            background: rgba(251, 191, 36, 0.12);
+            color: #fbbf24;
         }
 
-        /* --- Utilities --- */
-        svg {
-            width: 1em;
-            height: 1em;
-            fill: currentColor;
+        /* ── Info Cards ──────────────────────────── */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.5rem;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .info-card:hover {
+            border-color: rgba(110, 231, 183, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .info-card h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .info-card p,
+        .info-card li {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.7;
+        }
+
+        .info-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .info-card li::before {
+            content: '→ ';
+            color: var(--accent-protein);
+            font-weight: 600;
+        }
+
+        /* ── Sources ──────────────────────────── */
+        .sources {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1.5rem;
+        }
+
+        .sources h2 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        }
+
+        .sources ol {
+            padding-left: 1.2rem;
+        }
+
+        .sources li {
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            line-height: 1.8;
+        }
+
+        .sources a {
+            color: var(--accent-protein);
+            text-decoration: none;
+        }
+
+        .sources a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 1rem 1rem 3rem;
+            }
+
+            .chart-card {
+                padding: 1rem;
+            }
+
+            .chart-wrapper {
+                height: 320px;
+            }
         }
     </style>
 </head>
+
 <body>
-
-    <header>
-        <div class="hero-content">
-            <span class="badge">Research & Analysis</span>
-            <h1>Carp Nutrition</h1>
-            <p>Science-backed feeding strategies, optimal protein-to-fat ratios, and temperature-dependent bait guides for catching 1-3kg carp.</p>
-            <a href="#explore" class="btn btn-primary">Explore Research</a>
-        </div>
-    </header>
-
-    <main id="explore">
-        <div class="section-header">
-            <h2>Feeding Science</h2>
-            <p>Discover how water temperature and seasonal changes affect carp digestion and nutritional requirements.</p>
-        </div>
-
-        <div class="features-grid">
-            <!-- Card 1 -->
-            <div class="card">
-                <div class="card-icon">
-                    <svg viewBox="0 0 24 24"><path d="M19.5,9.5h-1a1,1,0,0,1,0-2h1a3,3,0,0,0,0-6h-1a1,1,0,0,1,0-2h1a5,5,0,0,1,0,10ZM5.5,9.5h1a1,1,0,0,1,0-2h-1a3,3,0,0,0,0-6h1a1,1,0,0,1,0-2h-1a5,5,0,0,1,0,10Zm9-3a1.5,1.5,0,1,0-1.5-1.5A1.5,1.5,0,0,0,14.5,6.5Zm-5,0a1.5,1.5,0,1,0-1.5-1.5A1.5,1.5,0,0,0,9.5,6.5Zm3,17a1,1,0,0,1-.6-.2l-5.4-4.1a6.83,6.83,0,0,1-2.5-5.3V8.8A2.8,2.8,0,0,1,6.8,6H17.2A2.8,2.8,0,0,1,20,8.8v5.1a6.83,6.83,0,0,1-2.5,5.3l-5.4,4.1A1,1,0,0,1,12.5,23.5ZM6.8,8A.8.8,0,0,0,6,8.8v5.1a4.83,4.83,0,0,0,1.8,3.8L12.5,21l4.7-3.3a4.83,4.83,0,0,0,1.8-3.8V8.8A.8.8,0,0,0,18.2,8Z"/></svg>
-                </div>
-                <h3>Temperature Ratios</h3>
-                <p>Detailed analysis of optimal protein and fat percentages based on specific water temperature ranges (10°C - 25°C).</p>
-                <a href="#" class="card-link">
-                    Read analysis
-                    <svg viewBox="0 0 24 24"><path d="M5,13H16.86l-3.35,3.34a1,1,0,0,0,1.42,1.42l5.06-5.06a1,1,0,0,0,0-1.42L14.93,6.24a1,1,0,1,0-1.42,1.42L16.86,11H5a1,1,0,0,0,0,2Z"/></svg>
-                </a>
+    <div class="bg-grid"></div>
+    <div class="container">
+        <header>
+            <div class="badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v20M2 12h20" />
+                    <circle cx="12" cy="12" r="10" />
+                </svg>
+                Dane oparte na badaniach naukowych
             </div>
-
-            <!-- Card 2 -->
-            <div class="card">
-                <div class="card-icon">
-                    <svg viewBox="0 0 24 24"><path d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Zm5.71,7.71-6,6a1,1,0,0,1-1.42,0l-2-2a1,1,0,0,1,1.42-1.42L11,13.59l5.29-5.3a1,1,0,1,1,1.42,1.42Z"/></svg>
+            <h1>Żywienie Karpia (1–3 kg)</h1>
+            <p>Optymalna zawartość białka i tłuszczu w paszy w zależności od temperatury wody — na podstawie publikacji
+                FAO, NRC i badań eksperymentalnych.</p>
+        </header>
+        <!-- CHART -->
+        <div class="chart-card">
+            <div class="chart-header">
+                <div class="chart-title">📊 Zawartość białka i tłuszczu (%) vs temperatura wody (°C)</div>
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:var(--accent-protein)"></div> Białko (%)
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:var(--accent-fat)"></div> Tłuszcz (%)
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background:var(--accent-ratio)"></div> Stosunek B:T
+                    </div>
                 </div>
-                <h3>Growth Optimization</h3>
-                <p>Specific dietary strategies targeting the 1-3kg weight class for maximum healthy growth entirely based on scientific literature.</p>
-                <a href="#" class="card-link">
-                    View strategies
-                    <svg viewBox="0 0 24 24"><path d="M5,13H16.86l-3.35,3.34a1,1,0,0,0,1.42,1.42l5.06-5.06a1,1,0,0,0,0-1.42L14.93,6.24a1,1,0,1,0-1.42,1.42L16.86,11H5a1,1,0,0,0,0,2Z"/></svg>
-                </a>
             </div>
-
-            <!-- Card 3 -->
-            <div class="card">
-                <div class="card-icon">
-                    <svg viewBox="0 0 24 24"><path d="M19,4H5A3,3,0,0,0,2,7V17a3,3,0,0,0,3,3H19a3,3,0,0,0,3-3V7A3,3,0,0,0,19,4ZM5,6H19a1,1,0,0,1,1,1V8.62L12.53,14a1,1,0,0,1-1.06,0L4,8.62V7A1,1,0,0,1,5,6ZM19,18H5a1,1,0,0,1-1-1V11.1l6.47,4.85a3,3,0,0,0,3.06,0L20,11.1V17A1,1,0,0,1,19,18Z"/></svg>
-                </div>
-                <h3>Bait Formulation</h3>
-                <p>Practical application of research into digestible, high-attractant boilie and pellet recipes tailored for the season.</p>
-                <a href="#" class="card-link">
-                    Get recipes
-                    <svg viewBox="0 0 24 24"><path d="M5,13H16.86l-3.35,3.34a1,1,0,0,0,1.42,1.42l5.06-5.06a1,1,0,0,0,0-1.42L14.93,6.24a1,1,0,1,0-1.42,1.42L16.86,11H5a1,1,0,0,0,0,2Z"/></svg>
-                </a>
+            <div class="chart-wrapper">
+                <canvas id="mainChart"></canvas>
             </div>
         </div>
-    </main>
-
-    <footer>
-        <p>&copy; 2026 Svaigas Fishing. Hosted via GitHub Pages.</p>
-    </footer>
-
+        <!-- TABLE -->
+        <div class="table-card">
+            <div class="table-card-header">
+                <h2>📋 Szczegółowe dane — karp 1–3 kg</h2>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Temp. wody (°C)</th>
+                            <th>Pora roku</th>
+                            <th>Białko (%)</th>
+                            <th>Tłuszcz (%)</th>
+                            <th>Stosunek B:T</th>
+                            <th>Dawka (% m.c./dzień)</th>
+                            <th>Uwagi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <!-- INFO CARDS -->
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>🧬 Białko — kluczowe zasady</h3>
+                <ul>
+                    <li>Karp 1–3 kg wymaga 30–38% białka w paszy (NRC, FAO)</li>
+                    <li>W temp. 20–28°C metabolizm najwyższy → białko 35–38%</li>
+                    <li>Poniżej 12°C zdolność trawienia białka znacząco spada</li>
+                    <li>Nadmiar białka zimą → toksyczny amoniak w wodzie</li>
+                    <li>Optymalne spożycie: 7–8 g białka / kg m.c. / dzień</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <h3>🫧 Tłuszcz — kluczowe zasady</h3>
+                <ul>
+                    <li>Zalecany zakres: 5–15% tłuszczu w paszy</li>
+                    <li>W 23°C optymalny poziom to ok. 10–12% (efekt immunologiczny)</li>
+                    <li>W 16°C optymalny poziom to ok. 8% (badania NIH)</li>
+                    <li>Jesienią wyższy tłuszcz → budowanie rezerw na zimę</li>
+                    <li>Powyżej 15% → nadmierne otłuszczenie wątrobotrzustki</li>
+                    <li>Wymagane kwasy n-3 i n-6 (EFA)</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <h3>🌡️ Wpływ temperatury wody</h3>
+                <ul>
+                    <li>Optimum wzrostu karpia: 20–28°C</li>
+                    <li>&lt;7°C — metabolizm minimalny, karp prawie nie je</li>
+                    <li>7–14°C — powolne żerowanie, preferowane węglowodany</li>
+                    <li>15–20°C — wzrost przyspiesza, rośnie zapotrzebowanie na białko</li>
+                    <li>20–28°C — maksymalna aktywność żerowania i wzrostu</li>
+                    <li>&gt;30°C — stres cieplny, spadek apetytu</li>
+                </ul>
+            </div>
+            <div class="info-card">
+                <h3>📐 Stosunek B:T a efektywność</h3>
+                <ul>
+                    <li>Tłuszcz pełni funkcję „protein-sparing" — oszczędza białko</li>
+                    <li>Optymalny stosunek B:T: 3:1 do 5:1 w zależności od temperatury</li>
+                    <li>Latem stosunek B:T bliżej 3.2:1 (więcej tłuszczu względem białka)</li>
+                    <li>Zimą stosunek B:T bliżej 5:1 (mniej tłuszczu)</li>
+                    <li>30% białka + 8% tłuszczu — optymalne dla karpia &gt;100g (IFFO)</li>
+                </ul>
+            </div>
+        </div>
+        <!-- SOURCES -->
+        <div class="sources">
+            <h2>📚 Źródła naukowe</h2>
+            <ol>
+                <li><strong>NRC (2011)</strong> — <em>Nutrient Requirements of Fish and Shrimp</em>. National Research
+                    Council, National Academies Press.</li>
+                <li><strong>FAO (2023)</strong> — <em>Cyprinus carpio — Nutritional requirements</em>. <a
+                        href="https://www.fao.org/fishery/en/culturedspecies/cyprinus_carpio"
+                        target="_blank">fao.org</a></li>
+                <li><strong>Takeuchi, Watanabe & Ogino (1979)</strong> — <em>Optimum ratio of dietary energy to protein
+                        for carp</em>. Bulletin of the Japanese Society of Scientific Fisheries, 45(8), 983–987.</li>
+                <li><strong>Schwarz & Kirchgessner (1995)</strong> — <em>Effects of different diets on growth
+                        performance of common carp</em>. Journal of Applied Ichthyology, 11(1-2), 78–84.</li>
+                <li><strong>Guo et al. (2019)</strong> — <em>Optimal dietary lipid level for large-sized common
+                        carp</em>. Aquaculture Nutrition, 25(1), 149–160. (<a href="https://pubmed.ncbi.nlm.nih.gov/"
+                        target="_blank">PubMed / NIH</a>)</li>
+                <li><strong>Deng et al. (2021)</strong> — <em>Effects of dietary lipid levels on immunity of juvenile
+                        common carp at different temperatures (16°C vs 23°C)</em>. NIH / PubMed.</li>
+                <li><strong>Kim & Lee (2005)</strong> — <em>Protein and lipid requirements of juvenile Israeli
+                        carp</em>. Aquaculture Research, 36, 563–569.</li>
+                <li><strong>Hossain et al. (2001)</strong> — <em>Effect of dietary protein and lipid on growth of common
+                        carp fingerlings</em>. Indian Journal of Fisheries, 48(2), 181–187.</li>
+            </ol>
+        </div>
+    </div>
+    <script>
+        // ────────────────────────────────────────────────────────────
+        // DATA — based on synthesis of NRC, FAO, NIH and literature
+        // for common carp (Cyprinus carpio), 1–3 kg body weight
+        // ────────────────────────────────────────────────────────────
+        const feedData = [
+            { temp: 4, protein: 20, fat: 4, season: 'Zima', icon: '❄️', cls: 'winter', dose: '0.0–0.3', note: 'Metabolizm minimalny. Okazyjne dokarmianie lub brak.' },
+            { temp: 7, protein: 22, fat: 5, season: 'Zima', icon: '❄️', cls: 'winter', dose: '0.3–0.5', note: 'Powolne budzenie się apetytu. Łatwo strawne węglowodany.' },
+            { temp: 10, protein: 25, fat: 6, season: 'Wiosna', icon: '🌱', cls: 'spring', dose: '0.5–1.0', note: 'Rozpoczęcie żerowania. Stopniowe zwiększanie dawki.' },
+            { temp: 14, protein: 28, fat: 7, season: 'Wiosna', icon: '🌱', cls: 'spring', dose: '1.0–1.5', note: 'Wzrost aktywności trawiennej. Wzrasta potrzeba białka.' },
+            { temp: 18, protein: 32, fat: 8, season: 'Wiosna', icon: '🌸', cls: 'spring', dose: '1.5–2.5', note: 'Aktywny wzrost. Dobre wykorzystanie białka i tłuszczu.' },
+            { temp: 20, protein: 35, fat: 9, season: 'Lato', icon: '☀️', cls: 'summer', dose: '2.5–3.5', note: 'Optimum wzrostu. Wysokie zapotrzebowanie na białko.' },
+            { temp: 23, protein: 36, fat: 11, season: 'Lato', icon: '☀️', cls: 'summer', dose: '3.0–4.0', note: 'Szczyt metabolizmu. Optymalny stosunek B:T = ~3.3:1.' },
+            { temp: 25, protein: 38, fat: 12, season: 'Lato', icon: '☀️', cls: 'summer', dose: '3.0–4.0', note: 'Maksymalna intensywność karmienia. Tłuszcz oszczędza białko.' },
+            { temp: 28, protein: 36, fat: 11, season: 'Lato', icon: '🌡️', cls: 'summer', dose: '2.5–3.5', note: 'Wysoka temp. — lekki spadek apetytu. Dobra jakość białka.' },
+            { temp: 30, protein: 33, fat: 10, season: 'Lato', icon: '🌡️', cls: 'hot', dose: '2.0–3.0', note: 'Stres cieplny. Białko łatwo przyswajalne, mniejsze dawki.' },
+            { temp: 26, protein: 35, fat: 12, season: 'Jesień', icon: '🍂', cls: 'autumn', dose: '2.5–3.5', note: 'Jesienne tuczenie. Wyższy tłuszcz dla rezerw zimowych.' },
+            { temp: 20, protein: 32, fat: 10, season: 'Jesień', icon: '🍂', cls: 'autumn', dose: '2.0–2.5', note: 'Budowanie rezerw energetycznych przed zimą.' },
+            { temp: 15, protein: 28, fat: 9, season: 'Jesień', icon: '🍁', cls: 'autumn', dose: '1.0–1.5', note: 'Spadek temp. → mniejsze dawki. Tłuszcz nadal ważny.' },
+        ];
+        // Sort by temperature for chart display
+        const chartData = [...feedData].sort((a, b) => a.temp - b.temp);
+        // Remove duplicate temperatures for clean chart (keep unique temps)
+        const uniqueTemps = [];
+        const seen = new Set();
+        chartData.forEach(d => {
+            if (!seen.has(d.temp)) {
+                seen.add(d.temp);
+                uniqueTemps.push(d);
+            }
+        });
+        // ── Chart ───────────────────────────────────────────────────
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: uniqueTemps.map(d => d.temp + '°C'),
+                datasets: [
+                    {
+                        label: 'Białko (%)',
+                        data: uniqueTemps.map(d => d.protein),
+                        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-protein').trim(),
+                        backgroundColor: 'rgba(110, 231, 183, 0.1)',
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        pointHoverRadius: 9,
+                        pointBackgroundColor: '#0f1117',
+                        pointBorderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-protein').trim(),
+                        pointBorderWidth: 2.5,
+                        fill: true,
+                        tension: 0.35,
+                        yAxisID: 'y',
+                    },
+                    {
+                        label: 'Tłuszcz (%)',
+                        data: uniqueTemps.map(d => d.fat),
+                        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-fat').trim(),
+                        backgroundColor: 'rgba(251, 191, 36, 0.08)',
+                        borderWidth: 3,
+                        pointRadius: 6,
+                        pointHoverRadius: 9,
+                        pointBackgroundColor: '#0f1117',
+                        pointBorderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-fat').trim(),
+                        pointBorderWidth: 2.5,
+                        fill: true,
+                        tension: 0.35,
+                        yAxisID: 'y',
+                    },
+                    {
+                        label: 'Stosunek B:T',
+                        data: uniqueTemps.map(d => +(d.protein / d.fat).toFixed(1)),
+                        borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-ratio').trim(),
+                        backgroundColor: 'transparent',
+                        borderWidth: 2,
+                        borderDash: [6, 4],
+                        pointRadius: 4,
+                        pointHoverRadius: 7,
+                        pointBackgroundColor: '#0f1117',
+                        pointBorderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent-ratio').trim(),
+                        pointBorderWidth: 2,
+                        fill: false,
+                        tension: 0.35,
+                        yAxisID: 'y2',
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#1e2235',
+                        borderColor: '#3d4463',
+                        borderWidth: 1,
+                        titleColor: '#e2e8f0',
+                        bodyColor: '#94a3b8',
+                        padding: 14,
+                        cornerRadius: 10,
+                        titleFont: { size: 14, weight: '700' },
+                        bodyFont: { size: 13 },
+                        callbacks: {
+                            title: (items) => `🌡️ Temperatura: ${items[0].label}`,
+                            label: (item) => {
+                                if (item.datasetIndex === 2) return `  Stosunek B:T: ${item.raw}:1`;
+                                return `  ${item.dataset.label}: ${item.raw}%`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Temperatura wody (°C)',
+                            color: '#94a3b8',
+                            font: { size: 13, weight: '600' },
+                            padding: 10,
+                        },
+                        ticks: { color: '#64748b', font: { size: 12 } },
+                        grid: { color: 'rgba(255,255,255,0.04)' },
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Zawartość w paszy (%)',
+                            color: '#94a3b8',
+                            font: { size: 13, weight: '600' },
+                            padding: 10,
+                        },
+                        min: 0,
+                        max: 45,
+                        ticks: {
+                            color: '#64748b',
+                            font: { size: 12 },
+                            callback: v => v + '%',
+                        },
+                        grid: { color: 'rgba(255,255,255,0.04)' },
+                    },
+                    y2: {
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Stosunek B:T',
+                            color: '#818cf8',
+                            font: { size: 13, weight: '600' },
+                            padding: 10,
+                        },
+                        min: 2,
+                        max: 6,
+                        ticks: {
+                            color: '#818cf8',
+                            font: { size: 12 },
+                            callback: v => v + ':1',
+                        },
+                        grid: { drawOnChartArea: false },
+                    }
+                }
+            }
+        });
+        // ── Table ───────────────────────────────────────────────────
+        const tbody = document.getElementById('dataTableBody');
+        // Display data sorted by season order for the table
+        const seasonalOrder = feedData;
+        seasonalOrder.forEach(d => {
+            const ratio = (d.protein / d.fat).toFixed(1);
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>
+                    <div class="temp-cell">
+                        <div class="temp-icon temp-${d.temp <= 7 ? 'cold' : d.temp <= 15 ? 'cool' : d.temp <= 25 ? 'warm' : 'hot'}">${d.icon}</div>
+                        ${d.temp}°C
+                    </div>
+                </td>
+                <td><span class="season-badge season-${d.cls}">${d.season}</span></td>
+                <td class="protein-val">${d.protein}%</td>
+                <td class="fat-val">${d.fat}%</td>
+                <td class="ratio-val">${ratio}:1</td>
+                <td>${d.dose}%</td>
+                <td style="white-space:normal;max-width:260px;color:var(--text-secondary);font-size:0.82rem">${d.note}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    </script>
 </body>
+
 </html>
