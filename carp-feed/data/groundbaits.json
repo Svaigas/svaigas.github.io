@@ -43,9 +43,9 @@
     "id": "baitnow-pump-qin",
     "brand": "BatiNow",
     "name": "Pump QiN",
-    "protein": 1,
-    "fat": 1,
-    "notes": "Delikatna zanęta naturalna, niska zawartość białka i tłuszczu"
+    "protein": 15,
+    "fat": 19,
+    "notes": "Delikatna zanęta naturalna, niska zawartość białka i wysoka tłuszczu"
   },
   {
     "id": "aller-top",
