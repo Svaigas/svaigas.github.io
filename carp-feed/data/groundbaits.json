@@ -40,6 +40,14 @@
     "notes": "Delikatna zanęta naturalna, wysoka zawartość białka i tłuszczu"
   },
   {
+    "id": "baitnow-pump-qin",
+    "brand": "BatiNow",
+    "name": "Pump QiN",
+    "protein": 1,
+    "fat": 1,
+    "notes": "Delikatna zanęta naturalna, niska zawartość białka i tłuszczu"
+  },
+  {
     "id": "aller-top",
     "brand": "AllerAqua",
     "name": "Top",
