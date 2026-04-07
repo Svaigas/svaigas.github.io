@@ -8,11 +8,59 @@
     "notes": "Wysokobiałkowa zanęta feederowa, idealna w ciepłej wodzie"
   },
   {
+    "id": "sonubaits-mmm-dark",
+    "brand": "Sonubaits",
+    "name": "Match Method Mix Dark",
+    "protein": 31.6,
+    "fat": 12.2,
+    "notes": "Wysokobiałkowa zanęta feederowa, idealna w zimnej wodzie"
+  },
+  {
     "id": "sonubaits-dm-natural",
     "brand": "Sonubaits",
     "name": "DM Natural Feeder Biscuit & Corn",
     "protein": 11.35,
     "fat": 3.5,
     "notes": "Delikatna zanęta naturalna, niska zawartość białka i tłuszczu"
+  },
+  {
+    "id": "solbaits-fish-mix",
+    "brand": "Solbaits",
+    "name": "Fish mix dark",
+    "protein": 37.7,
+    "fat": 8.9,
+    "notes": "Delikatna zanęta naturalna, wysoka zawartość białka i niska tłuszczu"
+  },
+  {
+    "id": "solbaits-sweet-mix",
+    "brand": "Solbaits",
+    "name": "Sweet mix dark",
+    "protein": 37,
+    "fat": 12,
+    "notes": "Delikatna zanęta naturalna, wysoka zawartość białka i tłuszczu"
+  },
+  {
+    "id": "aller-top",
+    "brand": "AllerAqua",
+    "name": "Top",
+    "protein": 25,
+    "fat": 7,
+    "notes": "Pellet zanętowy 3mm"
+  },
+  {
+    "id": "aller-master",
+    "brand": "AllerAqua",
+    "name": "Top",
+    "protein": 35,
+    "fat": 9,
+    "notes": "Pellet zanętowy 2mm"
+  },
+  {
+    "id": "feederbait-club-series",
+    "brand": "FeederBait",
+    "name": "Club Series Dark Pellet",
+    "protein": 25,
+    "fat": 5.8,
+    "notes": "Pellet zanętowy 2mm"
   }
 ]
