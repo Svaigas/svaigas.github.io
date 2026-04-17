@@ -70,5 +70,21 @@
     "protein": 25,
     "fat": 5.8,
     "notes": "Pellet zanętowy 2mm"
+  },
+  {
+    "id": "feederbait-green-select",
+    "brand": "FeederBait",
+    "name": "Green Select",
+    "protein": 24.5,
+    "fat": 6.9,
+    "notes": "Zanęta zielona"
+  },
+  {
+    "id": "Osmo-alien-pellet",
+    "brand": "OSMO",
+    "name": "Alien Pellet",
+    "protein": 31,
+    "fat": 6,
+    "notes": "Pellet zanętowy 2mm"
   }
 ]
