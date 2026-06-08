@@ -64,6 +64,22 @@
     "notes": "Pellet zanętowy 2mm"
   },
   {
+    "id": "aller-best",
+    "brand": "AllerAqua",
+    "name": "Best",
+    "protein": 38,
+    "fat": 15,
+    "notes": "Pellet zanętowy 2mm"
+  },
+  {
+    "id": "aller-classic",
+    "brand": "AllerAqua",
+    "name": "Classic",
+    "protein": 30,
+    "fat": 7,
+    "notes": "Pellet zanętowy 2mm"
+  },
+  {
     "id": "feederbait-club-series",
     "brand": "FeederBait",
     "name": "Club Series Dark Pellet",
